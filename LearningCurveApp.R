@@ -34,6 +34,7 @@ ui <-
           
           tabPanel(
             "Analysis",
+            htmlOutput("Space"),
             textInput("studname", 
                       "Enter Your Name: ", 
                       value = "", 
@@ -95,6 +96,10 @@ server <- function(input, output) {
   ##### Defining Data Tables and Select Values #####  
   output$Blank<-renderText({
     "Enter Name Before Generating Report"
+  })
+  
+  output$Space<-renderText({
+    "<br>"
   })
   
   LegoSetColor=data.frame(Red = c("Windmill (1 Brick)","Car (2 Brick)","Crab (2 Brick)"),
