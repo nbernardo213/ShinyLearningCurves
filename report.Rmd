@@ -98,7 +98,7 @@ ggplot(data =params$Tbl,aes(params$Tbl[,1],params$Tbl[,4]))+
 ###**Combined Graphs**
 
 ```{r echo=FALSE,warning=FALSE,message=FALSE}
-   ggplot(data = params$dtlong,aes(params$dtlong[,1],Duration,color=Lego))+
+   ggplot(data = params$dtlong,aes(Trial,Duration,color=Lego))+
      geom_point(aes(shape = Lego),color = as.character(params$n))+
      geom_line()+
      ggtitle(paste(params$n," Set: Data"))+
@@ -110,7 +110,7 @@ ggplot(data =params$Tbl,aes(params$Tbl[,1],params$Tbl[,4]))+
 
 
 ```{r echo=FALSE,warning=FALSE,message=FALSE}
-   ggplot(data = params$dtlong,aes(params$dtlong[,1],Duration,color=Lego))+
+   ggplot(data = params$dtlong,aes(Trial,Duration,color=Lego))+
        ggtitle(paste(params$n," Set: Power Curves"))+
        theme(plot.title = element_text(size=20, hjust = .5))+
        xlab("Trials")+
@@ -121,7 +121,7 @@ ggplot(data =params$Tbl,aes(params$Tbl[,1],params$Tbl[,4]))+
 
 
 ```{r echo=FALSE,warning=FALSE,message=FALSE}
-   ggplot(data = params$dtlong,aes(params$dtlong[,1],Duration,color=Lego))+
+   ggplot(data = params$dtlong,aes(Trial,Duration,color=Lego))+
        geom_point(aes(shape = Lego),color = as.character(params$n))+
        geom_line()+
        ggtitle(paste(params$n," Set: Data and Power Curves"))+
