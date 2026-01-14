@@ -5,6 +5,7 @@ library(shinycssloaders)
 library(rhandsontable)
 library(stats)
 library(rmarkdown)
+library(rsconnect)
 
 header<-dashboardHeader(title=img(src="LEGO_Image.png", height = 200, align = "left"),titleWidth = 300)
 sidebar<-dashboardSidebar(
