@@ -563,8 +563,7 @@ server <- function(input, output, session) {
   outputOptions(output, "selectCol3", suspendWhenHidden = FALSE)
   outputOptions(output, "selectCol4", suspendWhenHidden = FALSE)
   
-  session$onSessionEnded(function() {
-    stopApp()
-  })
+  # Note: session$onSessionEnded with stopApp() removed to support multiple concurrent users
+  # Each user session is isolated and will clean up automatically when they disconnect
 }
 shinyApp(ui = ui, server = server)
