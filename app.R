@@ -34,8 +34,10 @@ sidebar<-dashboardSidebar(
     ),
     menuItem("Analysis",tabName = "Analysis",icon = icon("magnifying-glass-chart",class = "fa-solid fa-magnifying-glass-chart"),
              htmlOutput("BlankSpace"),
-             numericInput(inputId = "NumSets",label = "Number of Sets:",value = 4,min = 2,max = 4,step = 1),
-             numericInput(inputId = "Rows",label = "Number of Trials:",value = 4,min = 3,max = 20,step = 1),
+             selectInput(inputId = "NumSets", label = "Number of Sets:", 
+                        choices = c(1:4), selected = 4),
+             selectInput(inputId = "Rows", label = "Number of Trials:", 
+                        choices = c(3:20), selected = 4),
              uiOutput("selectCol1"),
              uiOutput("selectCol2"),
              uiOutput("selectCol3"),
@@ -65,6 +67,7 @@ body<-dashboardBody(
     tabBox(title = "",
            id="tabbox1",width = 400,height = 400,
            tabPanel("Data Entry",
+                    h4("Enter Data in Seconds:", style = "margin-top: 10px; margin-bottom: 15px;"),
                     rHandsontableOutput("HandTable", height = "600px")
            ),
            tabPanel("Individual Plot",
@@ -160,31 +163,18 @@ server <- function(input, output, session) {
                           Orange=c("Shop (1 Brick)","Lion (2 Brick)","Plane (2 Brick)"),
                           Green=c("Alligator (1 Brick)","Castle (1 Brick)","Tractor (3 Brick)"))
   
-  # Validate and enforce min/max for inputs
-  observe({
-    if (!is.null(input$Rows) && !is.na(input$Rows)) {
-      if (input$Rows < 3) {
-        updateNumericInput(session, "Rows", value = 3)
-      } else if (input$Rows > 20) {
-        updateNumericInput(session, "Rows", value = 20)
-      }
-    }
+  RowLen<-reactive({
+    req(input$Rows)
+    as.numeric(input$Rows)
   })
   
-  observe({
-    if (!is.null(input$NumSets) && !is.na(input$NumSets)) {
-      if (input$NumSets < 1) {
-        updateNumericInput(session, "NumSets", value = 1)
-      } else if (input$NumSets > 4) {
-        updateNumericInput(session, "NumSets", value = 4)
-      }
-    }
+  NumSets<-reactive({
+    req(input$NumSets)
+    as.numeric(input$NumSets)
   })
-  
-  RowLen<-reactive(input$Rows)
-  NumSets<-reactive(input$NumSets)
   
   DF<-reactive({
+    req(input$Rows, input$NumSets)
     df <- data.frame(Trial = 1:input$Rows)
     for(i in 1:input$NumSets) {
       df[paste0("Set", i)] <- 0
@@ -260,17 +250,23 @@ server <- function(input, output, session) {
   
   # Update structure when NumSets or Rows changes, but preserve user data where possible
   observeEvent(c(input$NumSets, input$Rows), {
+    req(input$NumSets, input$Rows)  # Only proceed if both inputs are valid
     if(!is.null(indat$data)) {
-      new_df <- DF()
-      # Try to preserve existing data
-      for(i in 1:min(ncol(indat$data), ncol(new_df))) {
-        for(j in 1:min(nrow(indat$data), nrow(new_df))) {
-          new_df[j,i] <- indat$data[j,i]
+      tryCatch({
+        new_df <- DF()
+        # Try to preserve existing data
+        for(i in 1:min(ncol(indat$data), ncol(new_df))) {
+          for(j in 1:min(nrow(indat$data), nrow(new_df))) {
+            new_df[j,i] <- indat$data[j,i]
+          }
         }
-      }
-      indat$data <- new_df
+        indat$data <- new_df
+      }, error = function(e) {
+        # Silently handle errors to prevent crashes
+        NULL
+      })
     }
-  })
+  }, ignoreNULL = TRUE)
   
   output$plotselect <- renderUI({
     SpecificSet<-names(indat$data)[2:(NumSets()+1)]
@@ -563,8 +559,7 @@ server <- function(input, output, session) {
   outputOptions(output, "selectCol3", suspendWhenHidden = FALSE)
   outputOptions(output, "selectCol4", suspendWhenHidden = FALSE)
   
-  session$onSessionEnded(function() {
-    stopApp()
-  })
+  # Note: session$onSessionEnded with stopApp() removed to support multiple concurrent users
+  # Each user session is isolated and will clean up automatically when they disconnect
 }
 shinyApp(ui = ui, server = server)

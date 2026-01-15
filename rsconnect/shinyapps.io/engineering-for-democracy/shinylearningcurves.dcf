@@ -5,6 +5,6 @@ account: engineering-for-democracy
 server: shinyapps.io
 hostUrl: https://api.shinyapps.io/v1
 appId: 16426565
-bundleId: 11444568
+bundleId: 11449475
 url: https://engineering-for-democracy.shinyapps.io/shinylearningcurves/
 version: 1
